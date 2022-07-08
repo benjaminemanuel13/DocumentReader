@@ -1,0 +1,44 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "Compile The Sucker",
+			"command": "D:\\z88dk\\bin\\zcc.exe",
+			"args": [
+				"+zx",
+				"-ID:\\Spectrum\\DocumentReader",
+				"-create-app",
+				"-lndos",
+				//"-lrs232plus.lib",
+				"-lrs232if1.lib",
+				"${file}",
+				"-o",
+				"${fileDirname}\\document"
+			],
+			"options": {},
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "shell",
+			"label": "Convert To WAV",
+			"command": "D:\\Spectrum\\DocumentReader\\com.bat",
+			"args": [],
+			"problemMatcher": []
+		},
+		{
+			"type": "shell",
+			"label": "FTP Code",
+			"command": "D:\\Spectrum\\FTPCode\\FTPCode\\FTPCode\\bin\\Debug\\net6.0\\FTPCode.exe",
+			"args": [
+				"D:\\Spectrum\\DocumentReader\\document.tzx",
+				"/SpectrumCode/document.tzx"
+			],
+			"problemMatcher": []
+		}
+	]
+}
