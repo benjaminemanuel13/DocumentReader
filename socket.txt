@@ -1,0 +1,40 @@
+Private blnConnected As Boolean
+
+
+Private Sub cmdSend_Click()
+    Dim str As String
+    str = "GET /newpass/ HTTP/1.1" & vbNewLine & "Host: localhost" & _
+        vbNewLine & "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.21) Gecko/20110830 Firefox/3.6.21" & _
+        vbNewLine & "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" & _
+        vbNewLine & "Accept-Language: en-us,en;q=0.5" & _
+        vbNewLine & "Accept-Encoding: gzip,deflate" & _
+        vbNewLine & "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7" & _
+        vbNewLine & "Keep-Alive: 115" & _
+        vbNewLine & "Connection: keep-alive"
+    winsock.Protocol = sckTCPProtocol
+    winsock.RemoteHost = "localhost"
+    winsock.RemotePort = 80
+    winsock.Connect
+    While Not blnConnected
+        DoEvents
+    Wend
+
+
+    winsock.SendData str
+
+End Sub
+
+
+Private Sub winsock_Connect()
+ blnConnected = True
+End Sub
+
+Private Sub winsock_DataArrival(ByVal bytesTotal As Long)
+    Dim strResponse As String
+    winsock.GetData strResponse, vbString, bytesTotal
+    info.Text = strResponse
+End Sub
+
+Private Sub winsock_Error(ByVal Number As Integer, Description As String, ByVal Scode As Long, ByVal Source As String, ByVal HelpFile As String, ByVal HelpContext As Long, CancelDisplay As Boolean)
+winsock.Close
+End Sub
