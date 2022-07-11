@@ -3,6 +3,8 @@
 #include <rs232.h>
 #include <spectrum.h>
 
+#include "codepage.c"
+
 uint8_t byte[1];
 
 int f;
@@ -180,6 +182,8 @@ void main()
 
 	//poke(10, 32768);
 
+	setChars();
+
     printf("Hello, welcome to Bens Document Loader.\n");
 
     printf ("\nInitializing at 1200 baud:");
@@ -195,15 +199,15 @@ void main()
 	zx_cls();
 
 	uint8_t command[250];
-	command[0] = 'a';
-	command[1] = 'b';
-	command[2] = 'c';
-	command[3] = 'd';
-	command[4] = 'e';
-	command[5] = 'f';
-	command[6] = 'g';
-	command[7] = 'h';
-	command[8] = 'i';
+	command[0] = 'A';
+	command[1] = 'B';
+	command[2] = 'C';
+	command[3] = 'D';
+	command[4] = '0';
+	command[5] = '1';
+	command[6] = '2';
+	command[7] = '3';
+	command[8] = '4';
 	command[9] = 'j';
 	command[10] = 'k';
 	command[11] = 'l';
