@@ -2,74 +2,10 @@
 #include <stdlib.h>
 #include <rs232.h>
 #include <spectrum.h>
+#include <unistd.h>
+#include <string.h>
 
 #include "codepage.c"
-
-uint8_t byte[1];
-
-int f;
-
-int add = 32768;
-
-void run()
-{
-	#asm
-		jmp 8000
-	#endasm
-}
-
-void assPut()
-{
-	#asm
-		ld b,0x0FF
-	EACH:
-		push bc
-		ld a, 0x41
-		RST 0x0008
-		DEFB 0x1E
-		pop bc
-		DJNZ EACH
-		RET
-	#endasm
-}
-
-void assGet()
-{
-	#asm
-		XOR a
-		RST 0x0008
-		defb 0x31
-		ld B, 0x0ff
-	Each2:
-		push bc
-		RST 0x0008
-		defb 0x1d
-		rst 0x0008
-		defb 0x1c
-		pop bc
-		djnz Each2
-		ret
-	#endasm
-}
-
-int poke(char v, unsigned char *address)
-{
-  #asm
-  
-  ld hl,2
-  add hl,sp              ; skip over return address on stack
-  ld e,(hl)
-  inc hl
-  ld d,(hl)              ; de = address
-  inc hl
-  ld a,(hl)              ; a = v, "char v" occupies 16 bits on stack
-                         ;  but only the LSB is relevant
-  ld (de), a
-  
-  ld hl,1                ; hl is the return parameter
-
-  #endasm
-}
 
 uint8_t convert(uint8_t innumber)
 {
@@ -142,11 +78,8 @@ int GetLength()
 	uint8_t len[6];
 
 	printf ("\nEchoing 6 bytes to length: ");
-	for (f=0; f<6; f++) {
+	for (int f=0; f < 6; f++) {
 		while (rs232_get(&len[f]) != RS_ERR_OK);
-
-		//printf("GotOne");
-		//printf ("%c", len[f]);
 	}
 
 	int length = strtol(len, NULL, 10);
@@ -161,7 +94,7 @@ void GetDocument(int length)
 {
 	uint8_t doc[1];
 
-	for (f=0; f<length; f++) {
+	for (int f=0; f < length; f++) {
 		while (rs232_get(&doc[0]) != RS_ERR_OK);
 
 		printf ("%c", doc[0]);
@@ -170,44 +103,36 @@ void GetDocument(int length)
 
 void pause()
 {
-	int c, d;
-   
-   	for (c = 1; c <= 327; c++)
+	for (int c = 1; c <= 654; c++)
     {}
 }
 
-void main()
+int runMain()
 {
-	char chr[6];
-
-	//poke(10, 32768);
-
-	setChars();
-
-    printf("Hello, welcome to Bens Document Loader.\n");
-
-    printf ("\nInitializing at 1200 baud:");
-	if (rs232_params(RS_BAUD_9600 | RS_BITS_8 | RS_STOP_1, RS_PAR_NONE) != RS_ERR_OK) {
+	if (rs232_params(RS_BAUD_600 | RS_BITS_8 | RS_STOP_1, RS_PAR_NONE) != RS_ERR_OK) {
 		printf ("  Error setting baud rate.  Exiting...\n");
 		exit(0);
 	}
+	
 	if (rs232_init() != RS_ERR_OK) {
 		printf ("  Initialization error.  Exiting...\n");
 		exit(0);
 	}
 
-	zx_cls();
-
-	uint8_t command[250];
-	command[0] = 'A';
-	command[1] = 'B';
-	command[2] = 'C';
-	command[3] = 'D';
-	command[4] = '0';
-	command[5] = '1';
-	command[6] = '2';
-	command[7] = '3';
-	command[8] = '4';
+	pause();
+	
+	char* comm;
+	uint8_t command[60];
+	
+	command[0] = 'a';
+	command[1] = 'b';
+	command[2] = 'c';
+	command[3] = 'd';
+	command[4] = 'e';
+	command[5] = 'f';
+	command[6] = 'g';
+	command[7] = 'h';
+	command[8] = 'i';
 	command[9] = 'j';
 	command[10] = 'k';
 	command[11] = 'l';
@@ -227,7 +152,7 @@ void main()
 	command[25] = 'z';
 	command[26] = 'X';
 
-	for(int i = 27; i < 250; i++)
+	for(int i = 27; i < 60; i++)
 	{
 		command[i] = "+";
 	}
@@ -235,51 +160,82 @@ void main()
 	command[58] = '#';
 	command[59] = '#';
 
-	printf("Stage 1");
+	printf("Stage 1\n");
 
-	uint8_t ch[1];
-	uint8_t cn[1];
+	char* com;
+	char con[60];
 
-	//while (rs232_get(&ch[0]) != RS_ERR_OK);
-	//printf ("%c", ch[0]);
+	printf("Command:");
+	scanf("%59s", com);
+	strcpy(con, com);
+
+	int len = strlen(con);
+
+	for(int i = 1; i <= len; i++)
+	{
+		command[i] = con[i - 1];
+	}
+
+	command[len + 1] = '=';
 
 	for(int i = 0; i < 59; i++)
 	{
 		rs232_put(command[i]);
-
 		pause();
 	}
 
-	//cn[0] = '#';
-	//rs232_put(cn);
-	//pause();
+	uint8_t ch[1];
+	uint8_t cn[1];
 
 	ch[0] = 0;
-	for(int i = 0; i < 27; i++)
+	for(int i = 0; i < len + 2; i++)
 	{
 		while (rs232_get(&ch[0]) != RS_ERR_OK || ch[0] == 0);
 		pause();
 		printf(" %u ", ch[0]);
 	}
 
-	while (rs232_get(&ch[0]) != RS_ERR_OK);
-	printf("%d", ch[0]);
 	printf("\n");
+
+	if (rs232_close() != RS_ERR_OK) {
+		printf ("  Error.  Exiting...\n");
+		exit(0);
+	}
+
+	return 1;
+}
+
+void main()
+{
+	char chr[6];
+	int running = 1;
+
+	setChars();
+
+    printf("Hello, welcome to Bens RS232 Project.\n");
+
+	//zx_cls();
+
+	while(running)
+	{
+		running = runMain();
+		pause();
+	}
 
 	printf("Stage 2");
 	sleep(30);
 
 	exit(0);
 
-	printf("Stage 2B");
+	//printf("Stage 2B");
 
-	int length = GetLength();
+	//int length = GetLength();
 
-	printf("Stage 3");
+	//printf("Stage 3");
 
-	GetDocument(length);
+	//GetDocument(length);
 	
-	printf("Stage 4");
+	//printf("Stage 4");
 
 	printf ("\n\nClosing RS232 port:\n");
 	if (rs232_close() != RS_ERR_OK) {

@@ -11,16 +11,16 @@ void setChars()
     }
 
     //numbers
-    charset[49] = '0';
-    charset[50] = '1';
-    charset[51] = '2';
-    charset[52] = '3';
-    charset[53] = '4';
-    charset[54] = '5';
-    charset[55] = '6';
-    charset[56] = '7';
-    charset[57] = '8';
-    charset[58] = '9';
+    charset[48] = '0';
+    charset[49] = '1';
+    charset[50] = '2';
+    charset[51] = '3';
+    charset[52] = '4';
+    charset[53] = '5';
+    charset[54] = '6';
+    charset[55] = '7';
+    charset[56] = '8';
+    charset[57] = '9';
 
     //upper case alphabet
     charset[65] = 'A';
