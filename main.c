@@ -188,12 +188,21 @@ int runMain()
 	uint8_t cn[1];
 
 	ch[0] = 0;
-	for(int i = 0; i < len + 2; i++)
+	uint8_t buff[60];
+
+	for(int i = 0; i < len + 3; i++)
 	{
-		while (rs232_get(&ch[0]) != RS_ERR_OK || ch[0] == 0);
+		while (rs232_get(&buff[i]) != RS_ERR_OK || buff[i] == 0);
 		pause();
-		printf(" %u ", ch[0]);
+		printf(" %u ", buff[i]);
+		pause();
 	}
+
+	//for(int i = 0; i < len + 1; i++)
+	//{
+	//	char cha = (unsigned char)buff[i];
+	//	printf("%d", cha);
+	//}
 
 	printf("\n");
 
